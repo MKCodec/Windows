@@ -215,5 +215,3 @@ Esse método é:
 * 💯 100% automatizado
 
 Ideal pra rodar dezenas ou milhares de clones.
-
-https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe?utm_source=chatgpt.com
