@@ -1,4 +1,4 @@
-# 🚀 Proxmox Windows Template (100% Automático – Sem Atalhos)
+# 🚀 Proxmox Windows Template (100% Automático)
 
 Guia definitivo para criar um template Windows totalmente automatizado usando apenas comandos (CMD/PowerShell).
 
