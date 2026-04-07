@@ -72,8 +72,43 @@ cleanmgr /sagerun:1
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
 
+  <!-- ===================== -->
+  <!-- PASS: specialize -->
+  <!-- ===================== -->
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-International-Core"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+
+      <InputLocale>pt-BR</InputLocale>
+      <SystemLocale>pt-BR</SystemLocale>
+      <UILanguage>pt-BR</UILanguage>
+      <UserLocale>pt-BR</UserLocale>
+
+    </component>
+
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+
+      <ComputerName>*</ComputerName>
+
+    </component>
+  </settings>
+
+  <!-- ===================== -->
+  <!-- PASS: oobeSystem -->
+  <!-- ===================== -->
   <settings pass="oobeSystem">
-    <component name="Microsoft-Windows-Shell-Setup">
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
 
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
@@ -98,14 +133,13 @@ cleanmgr /sagerun:1
         </AdministratorPassword>
       </UserAccounts>
 
-      <ComputerName>*</ComputerName>
       <TimeZone>E. South America Standard Time</TimeZone>
 
     </component>
   </settings>
 
 </unattend>
-"@ | Set-Content -Encoding UTF8 C:\Windows\System32\Sysprep\unattend.xml
+"@ | Out-File C:\Windows\System32\Sysprep\unattend.xml -Encoding utf8
 ```
 
 ---
