@@ -158,10 +158,13 @@ Conteúdo:
 ```bat
 @echo off
 
-:retry
-powershell -Command "Invoke-WebRequest -Uri 'https://cdn.earnapp.com/static/earnapp-setup-latest.exe' -OutFile 'C:\earnapp.exe'" || goto retry
+timeout /t 20
 
-start /wait C:\earnapp.exe /S
+:retry
+powershell -Command "try { Invoke-WebRequest -Uri 'https://cdn.earnapp.com/static/earnapp-setup-latest.exe' -OutFile 'C:\earnapp.exe' -ErrorAction Stop } catch { exit 1 }"
+if not exist C:\earnapp.exe goto retry
+
+start /wait "" C:\earnapp.exe /S
 
 del C:\earnapp.exe
 ```
