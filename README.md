@@ -10,7 +10,7 @@ Guia definitivo para criar um template Windows totalmente automatizado usando ap
 * Windows inicia direto no desktop
 * Login automático
 * Máquina única (SID, hostname, rede)
-* Já com programas instalados
+* Programas instalados automaticamente no primeiro boot
 * Sem usar atalhos (Ctrl + Shift + F3)
 
 ---
@@ -21,7 +21,7 @@ Guia definitivo para criar um template Windows totalmente automatizado usando ap
 * Instale o Windows normalmente
 * Finalize até entrar no desktop
 
-👉 Aqui você pode logar normalmente (não tem problema)
+👉 Pode logar normalmente (sem problema)
 
 ---
 
@@ -29,29 +29,29 @@ Guia definitivo para criar um template Windows totalmente automatizado usando ap
 
 Abra **CMD como administrador** e execute:
 
-```bat id="cmd1"
+```bat
 C:\Windows\System32\Sysprep\sysprep.exe /audit /reboot
 ```
 
-👉 O Windows vai reiniciar em **Audit Mode automaticamente**
+👉 O Windows reiniciará em **Audit Mode automaticamente**
 
 ---
 
 ## 🧰 3. Preparar o sistema
 
-Agora configure tudo que quer no template:
+Configure tudo que deseja no template:
 
-### 📦 Instalar programa (exemplo)
+### 📦 Instalar programas
 
-```bat id="cmd2"
+```bat
 C:\instaladores\app.exe /silent /norestart
 ```
 
 ---
 
-### 📥 Baixar arquivo automaticamente
+### 📥 Baixar arquivos automaticamente
 
-```powershell id="cmd3"
+```powershell
 powershell -Command "Invoke-WebRequest -Uri 'https://site.com/arquivo.zip' -OutFile 'C:\Users\Public\Downloads\arquivo.zip'"
 ```
 
@@ -59,17 +59,15 @@ powershell -Command "Invoke-WebRequest -Uri 'https://site.com/arquivo.zip' -OutF
 
 ### 🧹 Limpeza (opcional)
 
-```bat id="cmd4"
+```bat
 cleanmgr /sagerun:1
 ```
 
 ---
 
-## 📄 4. Criar o unattend.xml (via PowerShell)
+## 📄 4. Criar o unattend.xml
 
-Crie o arquivo automaticamente:
-
-```powershell id="cmd5"
+```powershell
 @"
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
@@ -80,6 +78,9 @@ Crie o arquivo automaticamente:
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
+        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
         <NetworkLocation>Work</NetworkLocation>
         <ProtectYourPC>1</ProtectYourPC>
       </OOBE>
@@ -100,66 +101,55 @@ Crie o arquivo automaticamente:
       <ComputerName>*</ComputerName>
       <TimeZone>E. South America Standard Time</TimeZone>
 
-      <FirstLogonCommands>
-        <SynchronousCommand>
-          <Order>1</Order>
-          <CommandLine>C:\setup\firstboot.bat</CommandLine>
-        </SynchronousCommand>
-      </FirstLogonCommands>
-
     </component>
   </settings>
 
 </unattend>
-"@ | Out-File -Encoding UTF8 C:\Windows\System32\Sysprep\unattend.xml
+"@ | Set-Content -Encoding UTF8 C:\Windows\System32\Sysprep\unattend.xml
 ```
 
 ---
 
-## 🔥 5. Criar script de primeiro boot
+## 🔥 5. Criar SetupComplete (EXECUTA COMO ADMIN)
 
-```bat id="cmd6"
-mkdir C:\setup
+```bat
+mkdir C:\Windows\Setup\Scripts
 ```
 
-```bat id="cmd7"
-notepad C:\setup\firstboot.bat
+```bat
+notepad C:\Windows\Setup\Scripts\SetupComplete.cmd
 ```
 
 Conteúdo:
 
-```bat id="cmd8"
+```bat
 @echo off
 
-:: hostname opcional custom
-wmic computersystem where name="%computername%" call rename name="WIN-%RANDOM%"
+:retry
+powershell -Command "Invoke-WebRequest -Uri 'https://cdn.earnapp.com/static/earnapp-setup-latest.exe' -OutFile 'C:\earnapp.exe'" || goto retry
 
-:: exemplo: abrir programa
-start "" "C:\Program Files\App\app.exe"
+start /wait C:\earnapp.exe /S
 
-:: remover script
-del "%~f0"
+del C:\earnapp.exe
 ```
 
 ---
 
 ## ⚡ 6. Rodar Sysprep FINAL
 
-Agora o mais importante:
-
-```bat id="cmd9"
+```bat
 C:\Windows\System32\sysprep\sysprep.exe /oobe /generalize /shutdown /unattend:C:\Windows\System32\Sysprep\unattend.xml
 ```
 
 ---
 
-## 🧠 O que acontece aqui
+## 🧠 O que acontece
 
-* `/generalize` → cria nova identidade
-* `ComputerName=*` → hostname único automático
+* `/generalize` → nova identidade (SID único)
+* `ComputerName=*` → hostname automático
 * Proxmox → MAC único
-* XML → remove telas
-* FirstBoot → executa script automático
+* XML → remove telas de configuração
+* `SetupComplete.cmd` → executa como SYSTEM (admin total)
 
 ---
 
@@ -167,14 +157,14 @@ C:\Windows\System32\sysprep\sysprep.exe /oobe /generalize /shutdown /unattend:C:
 
 No Proxmox:
 
-* Clique na VM
-* **Convert to Template**
+* Selecione a VM
+* Clique em **Convert to Template**
 
 ---
 
 ## 🔁 8. Clonar via CLI
 
-```bash id="cmd10"
+```bash
 qm clone 100 200 --name win-200 --full false
 qm start 200
 ```
@@ -190,18 +180,17 @@ Cada VM clonada:
 * 🆔 SID único
 * 🖥️ Hostname único
 * 🌐 MAC único
-* 📦 Programas já instalados
-* 📥 Arquivos já baixados
+* 📦 Programas instalados automaticamente
 * ⚙️ Zero configuração manual
 
 ---
 
-## ⚠️ Checklist de segurança
+## ⚠️ Checklist
 
-✔ Usou `/generalize`
-✔ XML correto
-✔ Caminho do XML certo
-✔ Não iniciou a VM antes de virar template
+* ✔ Usou `/generalize`
+* ✔ XML no caminho correto
+* ✔ Não iniciou a VM antes de virar template
+* ✔ SetupComplete criado corretamente
 
 ---
 
@@ -212,6 +201,6 @@ Esse método é:
 * 🔥 Estável
 * ⚡ Rápido
 * 🧠 Escalável
-* 💯 100% automatizado
+* 💯 Totalmente automatizado
 
-Ideal pra rodar dezenas ou milhares de clones.
+Perfeito para rodar dezenas ou milhares de clones no Proxmox.
