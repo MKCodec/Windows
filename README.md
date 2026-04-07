@@ -72,21 +72,16 @@ cleanmgr /sagerun:1
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
 
-  <!-- ===================== -->
-  <!-- PASS: specialize -->
-  <!-- ===================== -->
   <settings pass="specialize">
     <component name="Microsoft-Windows-International-Core"
                processorArchitecture="amd64"
                publicKeyToken="31bf3856ad364e35"
                language="neutral"
                versionScope="nonSxS">
-
-      <InputLocale>pt-BR</InputLocale>
-      <SystemLocale>pt-BR</SystemLocale>
-      <UILanguage>pt-BR</UILanguage>
-      <UserLocale>pt-BR</UserLocale>
-
+      <InputLocale>0409:00000409</InputLocale>
+      <SystemLocale>en-US</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UserLocale>en-US</UserLocale>
     </component>
 
     <component name="Microsoft-Windows-Shell-Setup"
@@ -94,22 +89,27 @@ cleanmgr /sagerun:1
                publicKeyToken="31bf3856ad364e35"
                language="neutral"
                versionScope="nonSxS">
-
       <ComputerName>*</ComputerName>
-
     </component>
   </settings>
 
-  <!-- ===================== -->
-  <!-- PASS: oobeSystem -->
-  <!-- ===================== -->
   <settings pass="oobeSystem">
+    <component name="Microsoft-Windows-International-Core"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <InputLocale>0409:00000409</InputLocale>
+      <SystemLocale>en-US</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UserLocale>en-US</UserLocale>
+    </component>
+
     <component name="Microsoft-Windows-Shell-Setup"
                processorArchitecture="amd64"
                publicKeyToken="31bf3856ad364e35"
                language="neutral"
                versionScope="nonSxS">
-
       <OOBE>
         <HideEULAPage>true</HideEULAPage>
         <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
@@ -134,7 +134,6 @@ cleanmgr /sagerun:1
       </UserAccounts>
 
       <TimeZone>E. South America Standard Time</TimeZone>
-
     </component>
   </settings>
 
